@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Todo {
-  Todo(this.id, this.title);
   final int id;
   final String title;
+  Todo(this.id, this.title);
   bool done = false;
 }
 
@@ -18,7 +18,6 @@ class _TodoPageState extends State<TodoPage> {
   final _input = TextEditingController(); 
   int _nextId = 0;
 
-  // Variables for the Undo feature
   Todo? _lastDeletedTodo;
   int? _lastDeletedIndex;
 
@@ -38,6 +37,7 @@ class _TodoPageState extends State<TodoPage> {
 
   void _toggle(Todo todo) {
     setState(() => todo.done = !todo.done);
+    //todo.done=!todo.done;
   }
 
   void _remove(Todo todo) {
@@ -56,7 +56,6 @@ class _TodoPageState extends State<TodoPage> {
 
   int _countDone() {
     int done = 0;
-    // Bug 1 fixed: loop boundary correctly set to < _todos.length
     for (var i = 0; i < _todos.length; i++) {
       done += _todos[i].done ? 1 : 0;
     }
@@ -65,9 +64,8 @@ class _TodoPageState extends State<TodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    String? _filter; // Simulated filter variable
+    String? _filter;
     
-    // Bug 3 fixed: handled the potential null safely instead of forcing it with '!'
     final visible = _todos.where(
       (t) => t.title.contains(_filter ?? '')).toList();
       
@@ -83,10 +81,10 @@ class _TodoPageState extends State<TodoPage> {
             ),
           ),
           Expanded(
-            child: visible.isEmpty // Using the calculated visible list
+            child: visible.isEmpty
                 ? const Center(child: Text('Nothing to do yet.'))
                 : ListView.builder(
-                    itemCount: visible.length, // Iterating over the visible items
+                    itemCount: visible.length,
                     itemBuilder: (context, i) {
                       final todo = visible[i];
                       return Dismissible(
@@ -94,7 +92,7 @@ class _TodoPageState extends State<TodoPage> {
                         direction: DismissDirection.endToStart, 
                         background: Container(color: Colors.red), 
                         onDismissed: (_) {
-                          // Save the item and its index before removing it
+
                           _lastDeletedIndex = _todos.indexOf(todo);
                           _lastDeletedTodo = todo;
                           
