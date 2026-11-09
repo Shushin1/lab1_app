@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import '../models/todo.dart';
+import '../api/todo_api.dart';
 
+/*
 class Todo {
   final int id;
   final String title;
   Todo(this.id, this.title);
   bool done = false;
 }
+*/
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
@@ -18,8 +22,32 @@ class _TodoPageState extends State<TodoPage> {
   final _input = TextEditingController(); 
   int _nextId = 0;
 
+  bool _loading = true;
+  String? _error;
+
   Todo? _lastDeletedTodo;
   int? _lastDeletedIndex;
+
+
+  Future<void> _load() async {
+    try {
+      final todos = await fetchTodos();
+      setState(() {
+        _todos.addAll(todos);
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed after 5 attempts';
+        _loading = false;
+      });
+  }
+}
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
 
   @override
   void dispose() {
@@ -30,13 +58,28 @@ class _TodoPageState extends State<TodoPage> {
   void _add() {
     if (_input.text.isEmpty) return;
     setState(() {
-      _todos.add(Todo(_nextId++, _input.text)); 
+      //_todos.add(Todo(_nextId++, _input.text)); 
+      _todos.add(Todo(
+        userId:1,
+        id: _nextId++,
+        title: _input.text,
+        completed: false,
+      ));
     });
     _input.clear();
   }
 
   void _toggle(Todo todo) {
-    setState(() => todo.done = !todo.done);
+    final i = _todos.indexOf(todo);
+    setState(() {
+      _todos[i] = Todo(
+        userId: todo.userId,
+        id: todo.id,
+        title: todo.title,
+        completed: !todo.completed,
+      );
+    });
+    //setState(() => todo.done = !todo.done);
     //todo.done=!todo.done;
   }
 
@@ -57,17 +100,18 @@ class _TodoPageState extends State<TodoPage> {
   int _countDone() {
     int done = 0;
     for (var i = 0; i < _todos.length; i++) {
-      done += _todos[i].done ? 1 : 0;
+      //done += _todos[i].done ? 1 : 0;
+      done += _todos[i].completed ? 1 : 0;
     }
     return done;
   }
 
   @override
   Widget build(BuildContext context) {
-    String? _filter;
+    String? filter;
     
     final visible = _todos.where(
-      (t) => t.title.contains(_filter ?? '')).toList();
+      (t) => t.title.contains(filter ?? '')).toList();
       
     return Scaffold(
       appBar: AppBar(title: Text('Todo (Done: ${_countDone()})')),
@@ -81,11 +125,15 @@ class _TodoPageState extends State<TodoPage> {
             ),
           ),
           Expanded(
-            child: visible.isEmpty
-                ? const Center(child: Text('Nothing to do yet.'))
-                : ListView.builder(
-                    itemCount: visible.length,
-                    itemBuilder: (context, i) {
+            child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? Center(child: Text(_error!))
+                : visible.isEmpty
+                    ? const Center(child: Text('Nothing to do yet.'))
+                    : ListView.builder(
+                        itemCount: visible.length,
+                        itemBuilder: (context, i) {
                       final todo = visible[i];
                       return Dismissible(
                         key: ValueKey(todo.id), 
@@ -137,7 +185,8 @@ class TodoTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: Checkbox(
-          value: todo.done,
+          // value: todo.done,
+          value: todo.completed,
           onChanged: (_) => onToggle(),
         ),
         title: Text(todo.title),

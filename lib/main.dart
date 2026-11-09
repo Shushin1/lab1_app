@@ -4,9 +4,18 @@ import 'models/bank_account.dart';
 import 'models/library.dart';
 import 'models/book.dart';
 import 'models/magazine.dart';
-import 'screens/todo_screen.dart';
+import 'screens/todo_screen.dart'; 
+import 'models/todo.dart' as todo;
 
-void main() => runApp(MaterialApp(home: TodoPage()));
+
+void main() {
+  todo.Todo a = todo.Todo(userId: 1, id: 1, title: 'Test', completed: false);
+  todo.Todo b = todo.Todo(userId: 1, id: 1, title: 'Test', completed: false);
+
+  debugPrint('a == b: ${a == b}');
+
+  runApp(MaterialApp(home: TodoPage()));
+} 
 
 class LabApp extends StatelessWidget {
   final List<User> users = [

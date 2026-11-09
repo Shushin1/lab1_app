@@ -6,7 +6,7 @@ class Library {
 
   void addItem(LibraryItem item){
     if(items.contains(item)){
-      print('Item is already in library');
+      //print('Item is already in library');
       return;
     }
     items.add(item);
@@ -34,7 +34,7 @@ class Library {
 
   bool borrowItem(LibraryItem item, User user) {
     if (item.borrower != null) {
-      print('${item.title} is already borrowed.');
+      //print('${item.title} is already borrowed.');
       return false; 
     }
     item.borrower = user;
