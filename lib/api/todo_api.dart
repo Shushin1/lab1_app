@@ -20,7 +20,7 @@ Future<T> withRetry<T>(Future<T> Function() op) async {
     try {
       return await op();
     } catch (_) {
-      if (i == 4) rethrow;
+      if (i == 5) rethrow;
       final b = 400 * (1 << i);
       final delay = b + Random().nextInt(b);
       debugPrint('Attempt ${i + 1} failed, retrying in $delay ms');

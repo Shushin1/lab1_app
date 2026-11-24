@@ -4,17 +4,38 @@ import 'models/bank_account.dart';
 import 'models/library.dart';
 import 'models/book.dart';
 import 'models/magazine.dart';
+//import 'screens/todo_screen_old.dart'; 
 import 'screens/todo_screen.dart'; 
 import 'models/todo.dart' as todo;
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+//import 'todos/cubit/todo_cubit.dart';
+import 'package:dio/dio.dart';
+import 'todos/bloc/todo_bloc.dart';
+import 'todos/bloc/todo_event.dart';
+import 'todos/todo_repository.dart';
 
 void main() {
   todo.Todo a = todo.Todo(userId: 1, id: 1, title: 'Test', completed: false);
   todo.Todo b = todo.Todo(userId: 1, id: 1, title: 'Test', completed: false);
 
-  debugPrint('a == b: ${a == b}');
+  if (a == b) {debugPrint('a == b');}
+  else {debugPrint ('a != b');}
 
-  runApp(MaterialApp(home: TodoPage()));
+/*
+  runApp(
+    BlocProvider(
+      create: (_) => TodoCubit()..load(),
+      child: const MaterialApp(home: TodoPage()),
+    ),
+  );
+  */
+
+  runApp(
+    BlocProvider(
+      create: (_) => TodoBloc(TodoRepository(Dio()))..add(LoadTodos()),
+      child: const MaterialApp(home: TodoPage()),
+    ),
+  );
 } 
 
 class LabApp extends StatelessWidget {
